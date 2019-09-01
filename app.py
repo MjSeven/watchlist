@@ -28,11 +28,11 @@ def test_url_for():
 # 对错误进行分类处理
 from werkzeug.exceptions import HTTPException
 
-@app.errorhandler(Exception)
-def all_exception_handler(e):
-    if isinstance(e, HTTPException):
-        return e.description, e.code
-    return 'Error', 500
+# @app.errorhandler(Exception)
+# def all_exception_handler(e):
+#     if isinstance(e, HTTPException):
+#         return e.description, e.code
+#     return 'Error', 500
 
 
 name = 'Grey Li'
@@ -51,6 +51,5 @@ movies = [
 
 @app.route('/')
 def index():
-    print("我的替他那")
     return render_template('index.html', name=name, movies=movies)
 
