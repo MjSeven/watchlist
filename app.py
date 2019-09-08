@@ -6,16 +6,19 @@ from flask import Flask, url_for
 from flask import  render_template
 from flask_sqlalchemy import SQLAlchemy
 
-app = Flask(__name__)
-db = SQLAlchemy(app)
-
 WIN = sys.platform.startswith('win')
 if WIN:  # 如果是 Windows 系统，使用三个斜线
     prefix = 'sqlite:///'
 else:  # 否则使用四个斜线
     prefix = 'sqlite:////'
+
+app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = prefix + os.path.join(app.root_path, 'data.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False  # 关闭对模型修改的监控
+
+# 必须先配置 database 的路径，否则会提示错误
+
+db = SQLAlchemy(app)
 
 # 一个自定义命令
 @app.cli.command()
@@ -53,7 +56,6 @@ def forge():
     click.echo('Done.')
 
 
-
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(20))
@@ -88,6 +90,11 @@ def test_url_for():
 # def error_404(e):
 #     return '404 Error', 404
 
+@app.errorhandler(404)
+def page_not_found(e):
+    user = User.query.first()
+    return render_template('404.html'), 404
+
 # 对错误进行分类处理
 from werkzeug.exceptions import HTTPException
 
@@ -101,5 +108,10 @@ from werkzeug.exceptions import HTTPException
 def index():
     user = User.query.first()
     movies = Movie.query.all()
-    return render_template('index.html', user=user, movies=movies)
+    return render_template('index.html', movies=movies)
+
+@app.context_processor
+def inject_user():
+    user = User.query.first()
+    return dict(user=user)
 
