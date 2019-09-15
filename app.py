@@ -166,7 +166,7 @@ def login():
             flash('Login success.')
             return redirect(url_for('index'))
         
-        lash('Invalid username or password.')  # 如果验证失败，显示错误消息
+        flash('Invalid username or password.')  # 如果验证失败，显示错误消息
         return redirect(url_for('login'))  # 重定向回登录页面
     
     return render_template('login.html')
@@ -201,7 +201,7 @@ def index():
     movies = Movie.query.all()
     return render_template('index.html', movies=movies)
 
-@app.route('/moive/edit/<int:movie_id>', methods=['GET', 'POST'])
+@app.route('/movie/edit/<int:movie_id>', methods=['GET', 'POST'])
 @login_required
 def edit(movie_id):
     movie = Movie.query.get_or_404(movie_id)
@@ -217,7 +217,7 @@ def edit(movie_id):
         movie.title = title
         movie.year = year
         db.session.commit()
-        flash('Item updated')
+        flash('Item updated.')
         return redirect(url_for('index'))
     return render_template('edit.html', movie=movie)
 
@@ -227,7 +227,7 @@ def delete(movie_id):
     movie = Movie.query.get_or_404(movie_id)
     db.session.delete(movie)
     db.session.commit()
-    flash('Item deleted')
+    flash('Item deleted.')
     return redirect(url_for('index'))
 
 @app.route('/settings', methods=['GET', 'POST'])
